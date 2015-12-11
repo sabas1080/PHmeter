@@ -22,16 +22,16 @@
 #include <ESP8266WiFi.h>
 #include <aREST.h>
 #include <aREST_UI.h>
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 
 // Create aREST instance
 aREST_UI rest = aREST_UI();
 
-SoftwareSerial PhSerial(10, 11); // RX, TX
+//SoftwareSerial PhSerial(13, 12); // RX, TX
 
 // WiFi parameters
-const char* ssid = "0EF623";
-const char* password = "SABAS1080*_";
+const char* ssid = "513570";
+const char* password = "H21208269B2B";
 
 // The port to listen for incoming TCP connections 
 #define LISTEN_PORT           80
@@ -40,19 +40,25 @@ const char* password = "SABAS1080*_";
 WiFiServer server(LISTEN_PORT);
 
 // Variables to be exposed to the API
-int Ph;
+float Ph=0;
 String command;
 int indice=0;
 
 void setup()
 {
+  //Change Serial Pins GPIO 15 and GPIO3
+  //Serial.swap()
+  
   // Open serial communications with PC:
-  Serial.begin(115200);
+  Serial.begin(9600);
 
-  Serial.println("Ph Meter Ready!!");
+  //Serial1.begin(115200);
+  //Serial1.setDebugOutput(true);
+
+  //Serial.println("Ph Meter Ready!!");
 
   // set the data rate for the SoftwareSerial port PH Meter
-  PhSerial.begin(9600);
+  //PhSerial.begin(9600);
 
   // Create UI
   rest.title("Ph Meter 1.0v");
@@ -80,26 +86,25 @@ void setup()
   // Start the server
   server.begin();
   Serial.println("Server started");
-  
+
   // Print the IP address
   Serial.println(WiFi.localIP());
+  Serial.flush(); 
+  //delay(2000);
+
+  //Change Serial Pins GPIO15(TX) and GPIO13(RX) communications with Ph Sensor:
+  Serial.swap();
+  //delay(100); 
+  
 }
 
 void loop() // run over and over
 {
-  Ph = 0;
-  // Handle REST calls
-  WiFiClient client = server.available();
-  if (!client) {
-    return;
-  }
-  while(!client.available()){
-    delay(1);
-  }
-  rest.handle(client);
   
-  if (PhSerial.available()){
-    char c = PhSerial.read();
+  Serial.write("P");
+  
+  if (Serial.available()){
+    char c = Serial.read();
     
     if(indice>=7){
       
@@ -112,9 +117,16 @@ void loop() // run over and over
       indice++;
     }
   }
-  
-  if (Serial.available())
-    PhSerial.write(Serial.read());
+
+  // Handle REST calls
+  WiFiClient client = server.available();
+  if (!client) {
+    return;
+  }
+  while(!client.available()){
+    delay(1);
+  }
+  rest.handle(client);
 }
 
 void parseCommand(String com)
@@ -123,8 +135,6 @@ void parseCommand(String com)
   String VPh;
   etiqueta = com.substring(0,com.indexOf(":")+1);
   VPh =com.substring(com.indexOf(":")+1);
-  Ph= VPh.toInt();
-  Serial.println(etiqueta);
-  Serial.println(VPh);
+  Ph= VPh.toFloat();
 }
 
