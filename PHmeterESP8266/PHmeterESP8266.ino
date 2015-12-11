@@ -1,15 +1,14 @@
 /*
-  communications Arduino with PH Meter 1.0 Serial
+  Communications ESP8266 with PH Meter 1.0 Serial and WebServer
 
- Receives from the PC, sends to PH Meter.
- Receives from PH Meter, sends to PC.
+ Receives from the ESP8266, sends to Web Server.
+ Receives from PH Meter, sends  ESP8266.
 
  The circuit:
- * RX is digital pin 10 (connect to TX of PH Meter)
- * TX is digital pin 11 (connect to RX of PH Meter)
- * 3.3v of Arduino (connect to 3.3v of PH Meter)
- * 5v of Arduino (connect to 5v of PH Meter)
- * GND of Arduino (connect to GND of PH Meter)
+ * RX is digital GPIO 13 (connect to TX of PH Meter)
+ * TX is digital GPIO 15 (connect to RX of PH Meter)
+ * 3.3v of ESP8266 (connect to 3.3v of PH Meter)
+ * GND of ESP8266 (connect to GND of PH Meter)
  
  Created by
  Andrés Sabas
@@ -22,16 +21,13 @@
 #include <ESP8266WiFi.h>
 #include <aREST.h>
 #include <aREST_UI.h>
-//#include <SoftwareSerial.h>
 
 // Create aREST instance
 aREST_UI rest = aREST_UI();
 
-//SoftwareSerial PhSerial(13, 12); // RX, TX
-
 // WiFi parameters
-const char* ssid = "513570";
-const char* password = "H21208269B2B";
+const char* ssid = "SSIDYouWifi";
+const char* password = "Youpassword";
 
 // The port to listen for incoming TCP connections 
 #define LISTEN_PORT           80
